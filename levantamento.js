@@ -216,11 +216,47 @@ const produtosIniciais = [
     { nome: 'PURE FRESH STRONG (3 CAM+) 5X15 C/12', grupo: 'PERFETTI VAN MELLE' }
 ];
 
+function aplicarTema(temaEscuro) {
+    const body = document.body;
+    const button = document.getElementById('themeToggleBtn');
+    const icon = document.getElementById('themeIcon');
+    const label = document.getElementById('themeLabel');
+
+    body.classList.toggle('dark-theme', temaEscuro);
+    if (localStorage) {
+        localStorage.setItem('temaPreferido', temaEscuro ? 'dark' : 'light');
+    }
+
+    if (button && icon && label) {
+        button.classList.toggle('btn-light', !temaEscuro);
+        button.classList.toggle('btn-dark', temaEscuro);
+        icon.className = temaEscuro ? 'bi bi-sun-fill' : 'bi bi-moon-stars-fill';
+        label.textContent = temaEscuro ? 'Claro' : 'Escuro';
+    }
+}
+
+function iniciarTema() {
+    const temaSalvo = localStorage.getItem('temaPreferido');
+    const usaTemaEscuro = temaSalvo === 'dark' || (!temaSalvo && window.matchMedia('(prefers-color-scheme: dark)').matches);
+    aplicarTema(usaTemaEscuro);
+
+    const button = document.getElementById('themeToggleBtn');
+    if (button) {
+        button.addEventListener('click', () => {
+            const proximoTema = !document.body.classList.contains('dark-theme');
+            aplicarTema(proximoTema);
+        });
+    }
+}
+
 // Função para carregar o cabeçalho
 function carregarHeader() {
     fetch('header.html')
         .then(response => response.text())
-        .then(data => headerContainer.innerHTML = data)
+        .then(data => {
+            headerContainer.innerHTML = data;
+            iniciarTema();
+        })
         .catch(error => console.error('Erro ao carregar o cabeçalho:', error));
 }
 
